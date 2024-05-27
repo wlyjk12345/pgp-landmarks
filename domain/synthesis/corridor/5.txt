@@ -1,0 +1,19 @@
+CORRIDOR-5
+
+OBJECTS:
+a:agents
+b:agents
+s:objects
+
+INIT:
+( agent_at(a) = 0 )
+( agent_at(b) = 3 )
+( secret_at(s) = 3 )
+( sensed(s) = 0 )
+( secret(s) = 3 )
+( shared(s) = 3 )
+
+GOAL:
+
+EGOAL:
+( b [a] ( secret(s) = 1 ) @ 1 )

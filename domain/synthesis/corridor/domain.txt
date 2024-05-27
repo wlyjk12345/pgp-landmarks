@@ -1,0 +1,49 @@
+CORRIDOR
+
+STATE DESCRIPTOR:
+agents:var_type
+objects:var_type
+agent_at(agents):pred_type
+secret_at(objects):pred_type
+sensed(objects):pred_type
+secret(objects):pred_type
+shared(objects):pred_type
+a:agents
+s:objects
+
+ACTION: vector-right(x:agents)
+TYPE: memory
+PRECONDITIONS:
+( agent_at(x) + 1 )
+EFFECTS:
+( agent_at(x) += 1 )
+
+ACTION: vector-left(x:agents)
+TYPE: memory
+PRECONDITIONS:
+( agent_at(x) - 1 )
+EFFECTS:
+( agent_at(x) -= 1 )
+
+ACTION: sense(x:agents,y:objects)
+TYPE: memory
+PRECONDITIONS:
+( secret_at(y) = agent_at(x) )
+EFFECTS:
+( sensed(y) = 1 )
+
+ACTION: shout(x:agents,y:objects)
+TYPE: memory
+PRECONDITIONS:
+( sensed(y) = 1 )
+EFFECTS:
+( shared(y) = agent_at(x) )
+( secret(y) = 1 )
+
+ACTION: shout_lie(x:agents,y:objects)
+TYPE: memory
+PRECONDITIONS:
+( sensed(y) = 1 )
+EFFECTS:
+( shared(y) = agent_at(x) )
+( secret(y) = 0 )

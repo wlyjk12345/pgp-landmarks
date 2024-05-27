@@ -1,38 +1,46 @@
-COIN
+SN
 
 STATE DESCRIPTOR:
 agent:var_type
 object:var_type
-peeking(agent):pred_type
-face(object):pred_type
-a:agent
+friended_a(agent):pred_type
+friended_b(agent):pred_type
+nota(agent):pred_type
+post(object,agent):pred_type
+a:agenta
 b:agent
 c:object
 
-ACTION: single_peek(x:agent)
+ACTION: a_friends(x:agent)
 TYPE: memory
 PRECONDITIONS:
-( peeking(x) = 0 )
+( friended_b(x) = 0 )
+( nota(x) = 1 )
 EFFECTS:
-( peeking(x) = 1 )
+( friended_a(x) = 1 )
+( friended_b(x) = 1 )
 
-ACTION: return(x:agent)
+ACTION: a_unfriends(x:agent)
 TYPE: memory
 PRECONDITIONS:
-( peeking(x) = 1 )
+( friended_b(x) = 1 )
+( nota(x) = 1 )
 EFFECTS:
-( peeking(x) = 0 )
+( friended_a(x) = 0 )
+( friended_b(x) = 0 )
 
-ACTION: turn_coin_true(y:object)
+ACTION: a_post(x:agent,z:object)
 TYPE: memory
 PRECONDITIONS:
-( face(y) = 0 )
+( friended_b(x) = 1 )
+( post(z,x) = 0 )
 EFFECTS:
-( face(y) = 1 )
+( post(z,x) = 1 )
 
-ACTION: turn_coin_false(y:object)
+ACTION: a_unpost(x:agent,z:object)
 TYPE: memory
 PRECONDITIONS:
-( face(y) = 1 )
+( friended_b(x) = 1 )
+( post(z,x) = 1 )
 EFFECTS:
-( face(y) = 0 )
+( post(z,x) = 0 )

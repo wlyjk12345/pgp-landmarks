@@ -1,14 +1,14 @@
 [INFO] SOLUTION FOUND!!!
-[INFO] Expanded nodes: 8684
-[INFO] Evaluated nodes: 192242 (deadends: 23039)
-[INFO] Evaluated states: 169205
-0. single_peek(a)
+[INFO] Expanded nodes: 78350
+[INFO] Evaluated nodes: 1440527 (deadends: 288444)
+[INFO] Evaluated states: 3320185
+0. single_peek(a,b)
 1. turn_coin_true(c)
-2. inc(a)
-3. single_peek(a)
-4. end
-5. empty
+2. turn_coin_false(c)
+3. return(a,b)
+4. inc(a)
+5. goto(0,!(( zf = 1 )))
 6. end
 
-[INFO] Total time: 25.000
-[INFO] Search time: 25.000
+[INFO] Total time: 10591.000
+[INFO] Search time: 10591.000

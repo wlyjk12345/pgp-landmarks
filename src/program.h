@@ -69,8 +69,10 @@ public:
 
 		// Either True or False evaluation of End instructions is a halting condition
 		End* ins_end = dynamic_cast< End* > ( _instructions[ line ] );
-		if( ins_end ) return true;
-
+		//if( ins_end and line >= (_instructions.size()-1)) return true;
+        if( ins_end and line == (_instructions.size()-1)) return true;
+        //if( ins_end ) return true;
+//todo
         // Conditional effects, actions do not have to be necessarily applicable
 		// (OLD) If it's a planning action, it must be applicable
 		/*PlanningAction* ins_act = dynamic_cast< PlanningAction* > ( _instructions[ line ] );
@@ -85,38 +87,49 @@ public:
 		
 		return false;
 	}
-	
-	bool checkGoal( ProgramState *ps, Instance *ins, int &error , StateDescriptor* sd){
+
+
+    //todo
+    bool checkEndGoal(ProgramState *ps, Instance *ins, int &error , StateDescriptor* sd, int& error1){
+        int line = ps->getLine();
+        if( _instructions[ line ] == nullptr ) {
+            return false;}
+        End *end = dynamic_cast<End*>( _instructions[ line ] );
+        if( end and not end->isGoalState( ins, ps ) ){
+#ifdef DEBUG
+            //cout << ps->toString() << endl;
+#endif
+            error = -1; // ERROR 1: Incorrect program
+            return false;
+        }
+        if( end and error1 < 0 ){
+            error = -1; // ERROR 1: Incorrect program
+            return false;
+        }
+        return false;
+    }
+
+
+	bool checkGoal( ProgramState *ps, Instance *ins, int &error1 , StateDescriptor* sd){
 		int line = ps->getLine();
-		if( _instructions[ line ] == nullptr ) return false;
+		if( _instructions[ line ] == nullptr ) {
+            return false;}
 		End *end = dynamic_cast<End*>( _instructions[ line ] );
-		if( end and not end->isGoalState( ins, ps ) ){
-            #ifdef DEBUG
-			//cout << ps->toString() << endl;
-            #endif
-			error = -1; // ERROR 1: Incorrect program
-			return false;
-		}
 
 		std::map<std::string, PDDL_TERNARY> e_goal = ins->getEGoal();
 		// Check if egoal map is empty
-		if (!e_goal.empty()) {
-cout<<"program_goal"<<endl;
-for (const auto& entry : e_goal) {
-			std::cout << "Key:" << entry.first << ", Value:" << PDDL_TERNARY_to_string(entry.second) << std::endl;
-}	
+		if (!e_goal.empty() || error1 == 0 ) {
 
-
-
-		
 			EpistemicModel emodel;
 			std::map<std::string, PDDL_TERNARY> e_outcome = emodel.epistemicGoalsHandler(ins->getEGoal(), "", ps->_stateHistory, ps->_stateHistory, sd, ins);
 
-
-			if( end and not compare_e_goal(e_goal, e_outcome)) {
-				error = -1; // ERROR 1: Incorrect program
+			if( compare_e_goal(e_goal, e_outcome)) {
+				error1 = 0; // ERROR 1: Incorrect program
+                e_outcome.clear();
 				return false;
 			}
+
+            e_outcome.clear();
 		}
 
 		return false;
@@ -157,7 +170,7 @@ for (const auto& entry : e_goal) {
 		auto pred_names = sd->getPredicateTypes();
 
 		// One program state per instance
-		vector< ProgramState* > pss( num_instances ) ;
+        vector< ProgramState* > pss( num_instances ) ;
 		for( int i = 0; i < num_instances; i++ )
 			pss[ i ] = new ProgramState();
 
@@ -175,6 +188,7 @@ for (const auto& entry : e_goal) {
         }
 
         for( int id = 0; id < num_instances; id++ ){
+
             if(progressive_eval and not gpp->isInstanceActive(id) ) continue;
 			// Initialize local initial state
 			Instance *ins = gpp->getInstance( id );			
@@ -201,11 +215,15 @@ for (const auto& entry : e_goal) {
 
 			// For detecting infinite loops (it can be enhanced with a hash or bigint identifier)
 			set< vector<int> > visited;
-			int error = 0;
+            set< vector<int> > eVisited;       //todo
+			int error = 0;        //todo
+            int error1 = -1;
+
 
 			while( !haltingCondition( ps, error ) ){
-				if( infinite_detection ){
-					// Checking infinite loop (only for backward loops)
+				if(infinite_detection ){
+					// Checking infinite loop (only for backward loops)    //todo
+                    EpistemicModel emodel;
 					Goto *g = dynamic_cast<Goto*>( _instructions[ line ] );
 					if( g and g->getDestinationLine() < line ){
 						// Infinite loop detected
@@ -215,29 +233,35 @@ for (const auto& entry : e_goal) {
                         }
 #else
                         vector<int> state_id = ps->asVector();
-                        if( visited.find( state_id ) != visited.end() ){
+                        std::map<std::string, vector<State*>> e_outcome = emodel.epistemicPathsHandler(ins->getEGoal(), "", ps->_stateHistory, ps->_stateHistory, sd, ins);
+                        vector<int> e_state_id = emodel.asVector(e_outcome,ps);
+                        if( visited.find( state_id ) != visited.end() and eVisited.find( e_state_id ) != eVisited.end()){
                             error = -3; // ERROR 3: Infinite program
+                            //cout<<"same_state"<<endl;
                             break;
                         }
                         visited.insert( state_id );
+                        eVisited.insert(e_state_id);
 #endif
 					}
 				}
-				
+//todo
+
 				// Retrieving program line
 				line = ps->getLine();
                 // cout << ps->toString(sd) << endl;
 				// Applying current instruction						
 				int res = _instructions[ line ]->apply( ps );
 				_num_of_steps++;
-
-				// Mathematical planning actions update zero and carry flags
+                     // Mathematical planning actions update zero and carry flags
 				auto *act = dynamic_cast< PlanningAction* >( _instructions[ line ] );
 				if( act && act->getType() == "math" ){
 					s->setPointer(sd, "zf", ( res == 0 ?1:0) ); // zero-flag
                     if( CARRY_FLAG )
 					    s->setPointer(sd, "cf", ( res > 0 ? 1:0) ); // carry-flag
 				}
+
+                checkGoal( ps, ins, error1, sd);
 
 				if( use_landmarks ){
                     processReachedLandmarks( sd, rg, s, id, landmarks, accepted, false );
@@ -352,9 +376,9 @@ for (const auto& entry : e_goal) {
                 // NEW FOR NORMALIZATION
                 _unachieved_landmarks[id] = (int)not_accepted.size() + (int)required_again.size();
 			}
-
+//todo
             if( error == 0 )
-			    checkGoal( ps, ins, error, sd);
+			    checkEndGoal( ps, ins, error, sd, error1);
 			if( DEADEND_DETECTION and use_landmarks and error == 0) {
                 checkDeadEnd(sd, ps, _landmark_graph[id], error );
 			}

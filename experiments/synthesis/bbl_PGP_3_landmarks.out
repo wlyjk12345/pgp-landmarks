@@ -1,0 +1,10 @@
+[INFO] SOLUTION FOUND!!!
+[INFO] Expanded nodes: 2
+[INFO] Evaluated nodes: 27 (deadends: 1)
+[INFO] Evaluated states: 28
+0. turn_clockwise(a)
+1. turn_clockwise(a)
+2. end
+
+[INFO] Total time: 0.000
+[INFO] Search time: 0.000

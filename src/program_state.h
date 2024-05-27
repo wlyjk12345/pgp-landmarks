@@ -17,6 +17,13 @@ public:
 	
 	~ProgramState(){
 		delete _state;
+        // Delete each pointer in the vector
+        for (auto ptr : _stateHistory) {
+            delete ptr;
+        }
+
+        // Clear the vector if necessary
+        _stateHistory.clear();
 	}
 	
 	void setState( State *s ){

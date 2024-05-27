@@ -1,12 +1,12 @@
 [INFO] SOLUTION FOUND!!!
-[INFO] Expanded nodes: 464
-[INFO] Evaluated nodes: 8841 (deadends: 1829)
-[INFO] Evaluated states: 7014
-0. single_peek(a)
-1. turn_coin_true(c)
+[INFO] Expanded nodes: 555
+[INFO] Evaluated nodes: 7506 (deadends: 3323)
+[INFO] Evaluated states: 4185
+0. return(a,b)
+1. return(a,b)
 2. inc(a)
-3. single_peek(a)
+3. single_peek(a,b)
 4. end
 
-[INFO] Total time: 0.000
-[INFO] Search time: 0.000
+[INFO] Total time: 37.000
+[INFO] Search time: 37.000

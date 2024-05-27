@@ -157,7 +157,7 @@ public:
 		
 		return true;
 	}
-	
+
 	string toString( bool full_info ) const override{
 		string ret = "end\n";
 		if( full_info ){
@@ -168,6 +168,13 @@ public:
 		}
 		return ret;
 	}
+
+    int apply( ProgramState *ps ) override{
+        State *s = ps->getState();
+        int line = ps->getLine();
+        ps->setLine( line + 1 );
+        return 0;
+    }
 	
 };
 

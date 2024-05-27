@@ -1,7 +1,7 @@
-0. single_peek(a)
+0. single_peek(a,b)
 1. turn_coin_true(c)
-2. inc(a)
-3. single_peek(a)
-4. end
-5. empty
+2. turn_coin_false(c)
+3. return(a,b)
+4. inc(a)
+5. goto(0,!(( zf = 1 )))
 6. end

@@ -4,13 +4,17 @@ OBJECTS:
 a:agent
 b:agent
 c:object
+d:position
 
 INIT:
+( face(c) = 1 )
 ( peeking(a) = 0 )
 ( peeking(b) = 0 )
-( face(c) = 0 )
+( peeked(d) = 0 )
 
 GOAL:
-( peeking(a) = 0 )
-( peeking(b) = 1 )
-( face(c) = 0 )
+
+EGOAL:
+( b [b] b [a] ( face(c) = 1 ) @ 1 )
+( b [a] b [b] b [a] b [b] ( face(c) = 1 ) @ 1 )
+( b [a] b [b] b [a] ( face(c) = 1 ) @ 1 )

@@ -1,0 +1,26 @@
+BBL
+
+STATE DESCRIPTOR:
+agent:var_type
+object:var_type
+dir(agent):pred_type
+x(agent):pred_type
+y(agent):pred_type
+xo(object):pred_type
+yo(object):pred_type
+v(object):pred_type
+a:agent
+b:agent
+c:object
+
+ACTION: turn_clockwise(x:agent)
+TYPE: memory
+PRECONDITIONS:
+EFFECTS:
+( dir(x) += 1 )
+
+ACTION: turn_counter_clockwise(x:agent)
+TYPE: memory
+PRECONDITIONS:
+EFFECTS:
+( dir(x) -= 1 )

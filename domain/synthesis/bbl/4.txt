@@ -1,0 +1,23 @@
+BBL-4
+
+OBJECTS:
+a:agent
+b:agent
+c:object
+
+INIT:
+( dir(a) = 5 )
+( dir(b) = 5 )
+( x(a) = 3 )
+( x(b) = 2 )
+( xo(c) = 2 )
+( y(a) = 3 )
+( y(b) = 2 )
+( yo(c) = 1 )
+( v(c) = 1 )
+
+
+GOAL:
+
+EGOAL:
+( b [a] ( v(c) = 1 ) @ 1 )

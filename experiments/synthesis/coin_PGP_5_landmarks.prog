@@ -1,5 +1,5 @@
-0. single_peek(a)
-1. turn_coin_true(c)
+0. return(a,b)
+1. return(a,b)
 2. inc(a)
-3. single_peek(a)
+3. single_peek(a,b)
 4. end

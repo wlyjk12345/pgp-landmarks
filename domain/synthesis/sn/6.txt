@@ -1,0 +1,23 @@
+SN-7
+
+OBJECTS:
+a:agent
+b:agent
+c:agent
+d:object
+
+INIT:
+( nota(b) = 1 )
+( nota(c) = 1 )
+( friended_a(b) = 0 )
+( friended_b(b) = 0 )
+( friended_a(c) = 0 )
+( friended_b(c) = 0 )
+( post(d,b) = 0 )
+( post(d,c) = 0 )
+( secret(d) = 1 )
+
+GOAL:
+
+EGOAL:
+( b [a] ( secret(c) = 1 ) @ 1 )

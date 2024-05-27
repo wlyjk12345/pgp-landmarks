@@ -45,12 +45,16 @@ public:
 	}
 
 	void activateInstance( int id ){
+        std::cout << "Activating instance with id: " << id << std::endl;
+        std::cout << "Activating size " << (int)_active.size()<< std::endl;
+
 	    assert( 0<= id and id < (int)_active.size() );
         //for( int i = 0; i < (int)_active.size(); i++ ) _active[i] = false;
 	    _active[ id ] = true;
 	}
 
 	bool isInstanceActive( int id ){
+
 	    assert( id < (int)_active.size() );
 	    return _active[ id ];
 	}

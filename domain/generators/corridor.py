@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding: utf-8
 
 import sys
@@ -20,24 +20,54 @@ def main():
 	str_domain = "CORRIDOR\n\n"
 	str_domain += "STATE DESCRIPTOR:\n"
 	
-	str_domain += "object:var_type\n"
-	str_domain += "vector(object):pred_type\n"
-	str_domain += "i:object\n"
-	str_domain += "j:object\n"
-		
-	str_domain += "\nACTION: vector-right(x:object)\n"
-	str_domain += "TYPE: memory\n"
-	str_domain += "PRECONDITIONS:\n"
-	str_domain += "( vector(x) + 1 )\n"
-	str_domain += "EFFECTS:\n"
-	str_domain += "( vector(x) += 1 )\n"
+	str_domain += "agents:var_type\n"
+	str_domain += "objects:var_type\n"
+	str_domain += "agent_at(agents):pred_type\n"
+	str_domain += "secret_at(objects):pred_type\n"
+	str_domain += "sensed(objects):pred_type\n"
+	str_domain += "secret(objects):pred_type\n"
+	str_domain += "a:agents\n"
+	str_domain += "b:agents\n"
+	str_domain += "s:objects\n"
 	
-	str_domain += "\nACTION: vector-left(x:object)\n"
+		
+	str_domain += "\nACTION: vector-right(x:agents)\n"
 	str_domain += "TYPE: memory\n"
 	str_domain += "PRECONDITIONS:\n"
-	str_domain += "( vector(x) - 1 )\n"
+	str_domain += "( agent_at(x) + 1 )\n"
 	str_domain += "EFFECTS:\n"
-	str_domain += "( vector(x) -= 1 )\n"
+	str_domain += "( agent_at(x) += 1 )\n"
+	
+	str_domain += "\nACTION: vector-left(x:agents)\n"
+	str_domain += "TYPE: memory\n"
+	str_domain += "PRECONDITIONS:\n"
+	str_domain += "( agent_at(x) - 1 )\n"
+	str_domain += "EFFECTS:\n"
+	str_domain += "( agent_at(x) -= 1 )\n"
+	
+	str_domain += "\nACTION: sense(x:agents,y:objects)\n"
+	str_domain += "TYPE: memory\n"
+	str_domain += "PRECONDITIONS:\n"
+	str_domain += "( secret_at(y) = agent_at(x) )\n"
+	str_domain += "EFFECTS:\n"
+	str_domain += "( sensed(y) = 1 )\n"
+	
+	str_domain += "\nACTION: shout(x:agents,y:objects)\n"
+	str_domain += "TYPE: memory\n"
+	str_domain += "PRECONDITIONS:\n"
+	str_domain += "( sensed(y) = 1 )\n"
+	str_domain += "EFFECTS:\n"
+	str_domain += "( shared(y) = agent_at(x) )\n"
+	str_domain += "( secret(y) = 1 )\n"	
+	
+	str_domain += "\nACTION: shout_lie(x:agents,y:objects)\n"
+	str_domain += "TYPE: memory\n"
+	str_domain += "PRECONDITIONS:\n"
+	str_domain += "( sensed(y) = 1 )\n"
+	str_domain += "EFFECTS:\n"
+	str_domain += "( shared(y) = agent_at(x) )\n"
+	str_domain += "( secret(y) = -1 )\n"
+	
 
 	f_domain=open( out_folder + "domain.txt", "w" )
 	f_domain.write( str_domain )
@@ -52,27 +82,35 @@ def main():
 		str_problem = "CORRIDOR-" + str(i) + "\n"
 		
 		# Compute (pre)
-		vi = random.randint(0,i)
-		vgi = random.randint(0,i)
+		vi = random.randint(0,3)
+		vgi = random.randint(0,3)
+		i = random.randint(0,3)
+		j = random.randint(0,3)
 		while vgi == vi:
-			vgi = random.randint(0, i)
+			vgi = random.randint(0, 3)
 			
 		# Objects
 		str_problem += "\nOBJECTS:\n"
-		str_problem += "pos:object\n"
-		str_problem += "goal-pos:object\n"		
+		str_problem += "a:agents\n"
+		str_problem += "b:agents\n"		
+		str_problem += "s:objects\n"
 		
 		# Initial state
 		str_problem += "\nINIT:\n"
-		str_problem += "( vector(pos) = " + str(vi) + " )\n"
-		str_problem += "( vector(goal-pos) = " + str(vgi) + " )\n"
+		str_problem += "( agent_at(a) = " + str(vi) + " )\n"
+		str_problem += "( agent_at(b) = " + str(vgi) + " )\n"
+		str_problem += "( secret_at(s) = " + str(vgi) + " )\n"		
+		str_problem += "( sensed(s) = " + str(i) + " )\n"	
+		str_problem += "( secret(s) = " + str(j) + " )\n"	
+		str_problem += "( shared(s) = " + str(vgi) + " )\n"		
 		
 		# Compute		
 		
 		# Goal condition
 		str_problem += "\nGOAL:\n"
-		str_problem += "( vector(pos) = " + str(vgi) + " )\n"
-		str_problem += "( vector(goal-pos) = " + str(vgi) + " )\n"
+		
+		str_problem += "\nEGOAL:\n"
+		str_problem += "( b [a] b [b] ( secret(s) = 1 ) @ 1 )\n"
 		
 		#print( str_problem )
 		f_problem=open( out_folder + str( i+1-from_nth ) + ".txt","w")

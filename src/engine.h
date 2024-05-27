@@ -404,6 +404,8 @@ public:
                         swap( aux_open, _open );
                         cout << "[INFO] DONE!" << endl;
                         // Delete child and continue
+                        //todo
+                        //addNode(childs[i]);
                         delete childs[i];
                         continue;
                     }

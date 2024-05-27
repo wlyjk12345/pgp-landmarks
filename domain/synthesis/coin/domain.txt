@@ -2,26 +2,32 @@ COIN
 
 STATE DESCRIPTOR:
 agent:var_type
+position:var_type
 object:var_type
 peeking(agent):pred_type
 face(object):pred_type
+peeked(position):pred_type
 a:agent
-b:agent
+b:position
 c:object
 
-ACTION: single_peek(x:agent)
+ACTION: single_peek(x:agent,z:position)
 TYPE: memory
 PRECONDITIONS:
 ( peeking(x) = 0 )
+( peeked(z) = 0 )
 EFFECTS:
 ( peeking(x) = 1 )
+( peeked(z) = 1 )
 
-ACTION: return(x:agent)
+ACTION: return(x:agent,z:position)
 TYPE: memory
 PRECONDITIONS:
 ( peeking(x) = 1 )
+( peeked(z) = 1 )
 EFFECTS:
 ( peeking(x) = 0 )
+( peeked(z) = 0 )
 
 ACTION: turn_coin_true(y:object)
 TYPE: memory

@@ -14,8 +14,10 @@
 class EpistemicModel {
 public:
 
-    //static std::unordered_map<std::string, Entity> entities;
-    //static std::unordered_map<std::string, Variable> variables;
+    // Destructor
+    ~EpistemicModel() {
+        // Clean up dynamically allocated resources
+    }
 
     std::map<std::string, PDDL_TERNARY> epistemicGoalsHandler(std::map<std::string, PDDL_TERNARY> epistemic_goals_list, std::string prefix, vector<State*> &path,  vector<State*> &p_path, StateDescriptor *sd, Instance *ins ) {//std::vector<std::map<std::string, int>> path, std::vector<std::map<std::string, int>> p_path) {
         std::map<std::string, PDDL_TERNARY> perspectives_dict;
@@ -32,7 +34,6 @@ public:
                 // logger.debug("query key: [%s]", temp_eq);
 
                 PDDL_TERNARY result = _evaluateContent(path, temp_eq.q_content, sd, ins);
-cout<<"EMq_content:"<<temp_eq.q_content<<", result:"<<PDDL_TERNARY_to_string(result) <<endl;
                 result_dict[temp_eq.q_content] = result;
             } else {
                 // It means the query is not at the last level yet
@@ -62,6 +63,13 @@ cout<<"EMq_content:"<<temp_eq.q_content<<", result:"<<PDDL_TERNARY_to_string(res
             }
 
             std::map<std::string, PDDL_TERNARY> local_result_dict = epistemicGoalsHandler(item.content_value, key, new_path, p_path, sd, ins);
+
+            for (auto ptr : new_path) {
+                delete ptr;
+            }
+            // Clear the vector if necessary
+            new_path.clear();
+
             std::map<std::string, PDDL_TERNARY> local_perspectives = local_result_dict;
             for (auto const& [lp_key, lp_value] : local_perspectives) {
                 std::string p_key = key + lp_key;
@@ -72,7 +80,7 @@ cout<<"EMq_content:"<<temp_eq.q_content<<", result:"<<PDDL_TERNARY_to_string(res
                 std::string new_result_key = key + result_key;
                 PDDL_TERNARY new_result_value = result_value;
                 if (eq_type == EQ_TYPE::SEEING) {    
-                    if (!Coin::agentsExists(new_path, agt_id)) {                                    //TODO
+                    if (!Coin::agentsExists(new_path, agt_id)) {
                         new_result_value = PDDL_TERNARY::UNKNOWN;
                     } else if (result_value == PDDL_TERNARY::UNKNOWN) {
                         new_result_value = PDDL_TERNARY::FALSE;
@@ -83,7 +91,8 @@ cout<<"EMq_content:"<<temp_eq.q_content<<", result:"<<PDDL_TERNARY_to_string(res
                 result_dict[new_result_key] = new_result_value;
             }
         }
-
+        eq_dict.clear();
+        perspectives_dict.clear();
         return result_dict;
     }
 
@@ -193,11 +202,11 @@ cout<<"EMq_content:"<<temp_eq.q_content<<", result:"<<PDDL_TERNARY_to_string(res
             const int pred_idx = sd->getPredicateIDX( pred_type_string );
 
             for (auto& [obj_idxs, e] : content) {
-                std::cout << "\t find history value for [" << pred_type_string << "],[" << e << "]" << std::endl;
+                //std::cout << "\t find history value for [" << pred_type_string << "],[" << e << "]" << std::endl;
                 int ts_index = identifyLastSeenTimestamp(observation_list, pred_idx, obj_idxs);
-                std::cout << "\t last seen timestamp index: [" << ts_index << "]" << std::endl;
+                //std::cout << "\t last seen timestamp index: [" << ts_index << "]" << std::endl;
                 int value = identifyMemorizedValue(observation_list, ts_index, pred_idx, obj_idxs);
-                std::cout << "\t [" << pred_type << "]'s value is: [" << value << "]" << std::endl;
+                //std::cout << "\t [" << pred_type << "]'s value is: [" << value << "]" << std::endl;
                 new_state->setRegister(sd, pred_type, obj_idxs, value);
             }
         }
@@ -276,6 +285,87 @@ cout<<"EMq_content:"<<temp_eq.q_content<<", result:"<<PDDL_TERNARY_to_string(res
     }
 
 
+    std::map<std::string, vector<State*>> epistemicPathsHandler(std::map<std::string, PDDL_TERNARY> epistemic_goals_list, std::string prefix, vector<State*> &path,  vector<State*> &p_path, StateDescriptor *sd, Instance *ins ) {//std::vector<std::map<std::string, int>> path, std::vector<std::map<std::string, int>> p_path) {
+        std::map<std::string, PDDL_TERNARY> perspectives_dict;
+        std::map<std::string, EpistemicQuery> eq_dict;
+        std::map<std::string, PDDL_TERNARY> result_dict;
+        std::map<std::string, vector<State*>> result_path;
+
+
+        for (auto const& [epistemic_goal_str, value] : epistemic_goals_list) {
+            EpistemicQuery temp_eq = partially_converting_to_eq(epistemic_goal_str);
+            if (temp_eq.header_str.empty()) {
+                // This is the end of eq
+                // No need to generate perspectives
+                // Just need to evaluate the result and return value
+                // logger.debug("query key: [%s]", temp_eq);
+
+                //PDDL_TERNARY result = _evaluateContent(path, temp_eq.q_content, sd, ins);
+                //result_dict[temp_eq.q_content] = result;
+                result_path[""] = path;
+                return result_path;
+            } else {
+                // It means the query is not at the last level yet
+                std::string agents_str = temp_eq.agents_str;
+                std::string content = temp_eq.q_content;
+                std::string key = " " + temp_eq.header_str + " [" + agents_str + "]";
+
+                if (eq_dict.find(key) != eq_dict.end()) {
+                    eq_dict[key].content_value[content] = value;
+                } else {
+                    eq_dict[key] = EpistemicQuery(temp_eq.eq_type, temp_eq.agents_str, content, value);
+                }
+            }
+        }
+
+        for (auto const& [key, item] : eq_dict) {
+            vector<State*> new_path;
+            EQ_TYPE eq_type = item.eq_type;
+            int agt_id = ins->getObjectAddress(item.agents_str);
+            if (eq_type == EQ_TYPE::BELIEF) {
+                new_path = _generateOnePerspectives(path, agt_id, sd);
+
+            } else if (eq_type == EQ_TYPE::SEEING || eq_type == EQ_TYPE::KNOWLEDGE) {
+                new_path = _generateOneObservations(path, agt_id, sd);
+            } else {
+                assert("wrong eq_type of the epistemic query");
+            }
+            std::map<std::string, vector<State*>> local_result_path_dict = epistemicPathsHandler(item.content_value, key, new_path, p_path, sd, ins);
+            std::map<std::string, vector<State*>> local_perspectives = local_result_path_dict;
+            for (auto const& [lp_key, lp_value] : local_result_path_dict) {
+                std::string p_key = key + lp_key;
+                local_perspectives[p_key] = lp_value;
+            }
+            result_path = local_perspectives;
+        }
+        perspectives_dict.clear();
+        result_dict.clear();
+        eq_dict.clear();
+
+        return result_path;
+    }
+
+
+
+    vector<int> asVector(const std::map<std::string, std::vector<State*>>& e_outcome, ProgramState *ps) {
+        vector< int > res( 1, ps->getLine() );
+
+        for (const auto& pair : e_outcome) {
+            const State* state = pair.second.back();
+            auto vars = state->getStateVars();
+            for( auto v : vars ){
+                res.insert( res.end(), v.begin(), v.end() );
+            }
+        }
+        return res;
+    }
+
+    static void freeEStates( vector< ProgramState* > &vps ){
+        for( auto ps : vps ){
+            delete ps;
+        }
+    }
+
 
 	
 	static EpistemicQuery partially_converting_to_eq(std::string eq_str) {
@@ -297,7 +387,7 @@ cout<<"EMq_content:"<<temp_eq.q_content<<", result:"<<PDDL_TERNARY_to_string(res
         agents.erase(std::remove(agents.begin(), agents.end(), '['), agents.end());
 		agents.erase(std::remove(agents.begin(), agents.end(), ']'), agents.end());
 		
-		cout<<"EMheader_str:"<<header_str<<", agents:"<<agents<<", content:"<<content<<endl;
+		//cout<<"EMheader_str:"<<header_str<<", agents:"<<agents<<", content:"<<content<<endl;
         return EpistemicQuery(query_key, agents, content);
     }
 }

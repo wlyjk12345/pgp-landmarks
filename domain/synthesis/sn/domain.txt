@@ -1,0 +1,47 @@
+SN
+
+STATE DESCRIPTOR:
+agent:var_type
+object:var_type
+friended_a(agent):pred_type
+friended_b(agent):pred_type
+nota(agent):pred_type
+post(object,agent):pred_type
+secret(object):pred_type
+
+b:agent
+c:object
+
+ACTION: a_friends(x:agent)
+TYPE: memory
+PRECONDITIONS:
+( friended_b(x) = 0 )
+( nota(x) = 1 )
+EFFECTS:
+( friended_a(x) = 1 )
+( friended_b(x) = 1 )
+
+ACTION: a_unfriends(x:agent)
+TYPE: memory
+PRECONDITIONS:
+( friended_b(x) = 1 )
+( nota(x) = 1 )
+EFFECTS:
+( friended_a(x) = 0 )
+( friended_b(x) = 0 )
+
+ACTION: a_post(x:agent,z:object)
+TYPE: memory
+PRECONDITIONS:
+( friended_b(x) = 1 )
+( post(z,x) = 0 )
+EFFECTS:
+( post(z,x) = 1 )
+
+ACTION: a_unpost(x:agent,z:object)
+TYPE: memory
+PRECONDITIONS:
+( friended_b(x) = 1 )
+( post(z,x) = 1 )
+EFFECTS:
+( post(z,x) = 0 )

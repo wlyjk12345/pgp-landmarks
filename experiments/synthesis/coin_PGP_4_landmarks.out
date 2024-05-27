@@ -1,6 +1,6 @@
 [INFO] SOLUTION NOT FOUND :(
-[INFO] Expanded nodes: 377
-[INFO] Evaluated nodes: 4409 (deadends: 4032)
-[INFO] Evaluated states: 378
-[INFO] Total time: 2.000
-[INFO] Search time: 2.000
+[INFO] Expanded nodes: 270
+[INFO] Evaluated nodes: 2624 (deadends: 2353)
+[INFO] Evaluated states: 775
+[INFO] Total time: 5.000
+[INFO] Search time: 5.000

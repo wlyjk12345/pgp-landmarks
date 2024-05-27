@@ -22,25 +22,31 @@ def main():
 		
 		str_domain += "agent:var_type\n"
 		str_domain += "object:var_type\n"
+		str_domain += "position:var_type\n"
 		str_domain += "peeking(agent):pred_type\n"
 		str_domain += "face(object):pred_type\n"
+		str_domain += "peeked(position):pred_type\n"
+		
 		str_domain += "a:agent\n"
-		str_domain += "b:agent\n"
+		str_domain += "b:position\n"
 		str_domain += "c:object\n"
 		
-		str_domain += "\nACTION: single_peek(x:agent)\n"
-		str_domain += "TYPE: memory\n"
+		str_domain += "\nACTION: single_peek(x:agent,z:position)
 		str_domain += "PRECONDITIONS:\n"
 		str_domain += "( peeking(x) = 0 )\n"
+		str_domain += "( peeked(z) = 0 )\n"
 		str_domain += "EFFECTS:\n"
 		str_domain += "( peeking(x) = 1 )\n"
+		str_domain += "( peeked(z) = 1 )\n"
 		
-		str_domain += "\nACTION: return(x:agent)\n"
+		str_domain += "\nACTION: return(x:agent,z:position)\n"
 		str_domain += "TYPE: memory\n"
 		str_domain += "PRECONDITIONS:\n"
 		str_domain += "( peeking(x) = 1 )\n"
+		str_domain += "( peeked(z) = 1 )\n"
 		str_domain += "EFFECTS:\n"
 		str_domain += "( peeking(x) = 0 )\n"
+		str_domain += "( peeked(z) = 0 )\n"
 
 		str_domain += "\nACTION: turn_coin_true(y:object)\n"
 		str_domain += "TYPE: memory\n"
@@ -74,6 +80,7 @@ def main():
 			str_problem += "a:agent\n"
 			str_problem += "b:agent\n"
 			str_problem += "c:object\n"
+			str_problem += "d:position\n"
 			
 			# Initial state
 			str_problem += "\nINIT:\n"
@@ -82,7 +89,7 @@ def main():
 			
 			str_problem += "( peeking(a) = 0 )\n"
 			str_problem += "( peeking(b) = 0 )\n"
-
+			str_problem += "( peeked(d) = 0 )\n"
 			# Compute		
 				
 			# Goal condition
@@ -94,7 +101,7 @@ def main():
 			# EGoal condition
 			str_problem += "\nEGOAL:\n"
 			str_problem += "( b [a] ( face(c) = 1 ) @ 1 )"
-
+			str_problem += "( b [b] ( face(c) = 1 ) @ 1 )"
 			#print( str_problem )
 			f_problem=open( out_folder + str( instance_id ) + ".txt","w")
 			f_problem.write( str_problem )

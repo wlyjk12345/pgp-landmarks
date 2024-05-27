@@ -46,6 +46,10 @@ public:
             this->agents_str = agents_str;
             this->content_value[content] = value;
     }
+
+    ~EpistemicQuery() {
+        // Cleanup code if needed
+    }
 	
 	 // Add a toString() function
     std::string toString() const {

@@ -1,0 +1,17 @@
+COIN-10
+
+OBJECTS:
+a:agent
+b:agent
+c:object
+
+INIT:
+( face(c) = 1 )
+( peeking(a) = 1 )
+( peeking(b) = 0 )
+
+GOAL:
+
+EGOAL:
+( b [a] ( face(c) = 1 ) @ 1 )
+( b [b] ( face(c) = 1 ) @ 1 )
