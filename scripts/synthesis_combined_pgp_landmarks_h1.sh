@@ -7,3 +7,5 @@
 ./scripts/time_memory.sh ./main.bin PGP 12 "domain/synthesis/lock/" "landmarks" "h1"
 ./scripts/time_memory.sh ./main.bin PGP 12 "domain/synthesis/spanner/" "landmarks" "h1"
 ./scripts/time_memory.sh ./main.bin PGP 11 "domain/synthesis/ontable/" "landmarks" "h1"
+
+./scripts/time_memory.sh ./main.bin PGP 12 "domain/synthesis/coin/" "landmarks" "h1"

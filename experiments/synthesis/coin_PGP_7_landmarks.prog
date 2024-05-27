@@ -1,0 +1,7 @@
+0. single_peek(a)
+1. turn_coin_true(c)
+2. inc(a)
+3. single_peek(a)
+4. end
+5. empty
+6. end

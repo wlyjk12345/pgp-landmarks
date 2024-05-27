@@ -5,6 +5,10 @@
 #include "state.h"
 #include "condition.h"
 
+#include <map>
+#include <iostream>
+#include "PDDL_TERNARY.h"
+
 class Instance{
 public:
 	explicit Instance( const string &name = "", int instance_id = 0 ){
@@ -13,14 +17,18 @@ public:
 		_instance_id = instance_id;
 	}
 	
-	~Instance(){
-		delete _init;
+	~Instance() {
+    	delete _init;
+		// Clearing the goal map	
+		e_goal.clear();
 
 		for( auto g : _goal ){
 			delete g;
 		}
 		_goal.clear();
+
 	}
+
 	
 	void setName( const string &name = "" ){
 		_name = name;
@@ -30,14 +38,23 @@ public:
 		_init = init;
 		_init->setInstanceID( _instance_id );
 	}
-	
-	void setGoalCondition( vector< Condition* > &goal ){
+
+		void setGoalCondition( vector< Condition* > &goal ){
 		_goal = goal;
 	}
 	
 	void addCondition( Condition* cond ){
 		_goal.push_back( cond );
 	}
+	
+ 	void setEGoal(const std::map<std::string, PDDL_TERNARY>& newGoal) {
+        e_goal = newGoal;
+    }
+
+    // Add an individual goal
+    void addEGoal(const std::string& condition, PDDL_TERNARY value) {
+        e_goal[condition] = value;
+    }
 	
 	string getName() const{
 		return _name;
@@ -47,6 +64,10 @@ public:
 		return _init;
 	}
 	
+	std::map<std::string, PDDL_TERNARY> getEGoal(){
+		return e_goal;
+	}
+
 	vector< Condition* > getGoalCondition(){
 		return _goal;
 	}
@@ -101,6 +122,13 @@ public:
 		ret += "\nGOAL:\n";
 		for(auto g : _goal)
 			ret += g->toString(true);
+
+		ret += "\nEGOAL:\n";
+		for (const auto& pair : e_goal) {
+        	// Constructing a string representation of the key-value pair
+        	ret += pair.first + ": " + PDDL_TERNARY_to_string(pair.second) + "\n";
+		}
+
 		return ret;
 	}
 
@@ -115,20 +143,29 @@ public:
 		
 		ret += "\nINIT:\n";
 		if( _init )
-			ret += _init->toString( sd );
+			ret += _init->toString();
+
 		ret += "\nGOAL:\n";
-		for(auto & g : _goal)
-			ret += g->toString(false ) + "\n";
-		return ret;
+		for(auto g : _goal)
+			ret += g->toString(true);
+
+		ret += "\nEGOAL:\n";
+		 for (const auto& pair : e_goal) {
+        // Constructing a string representation of the key-value pair
+			ret += pair.first + ": " + PDDL_TERNARY_to_string(pair.second) + "\n";
+		}
+
+		return ret;;
 	}
 	
 private:
 	string _name;
 	State *_init;
-	vector< Condition* > _goal;
+	std::map<std::string, PDDL_TERNARY> e_goal;
 	int _instance_id;
 	map< string, string > obj_to_type;
 	map< string, int > obj_to_address;
+	vector< Condition* > _goal;
 };
 
 #endif

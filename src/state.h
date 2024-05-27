@@ -103,9 +103,26 @@ public:
         auto var_id_list = sd->getPredicateVarTypeIDs( pred_type );
         auto pred_idx = sd->getPredicateIDX( pred_type );
         assert( pred_idx < (int)_typed_registers.size() );
-        _typed_registers[ pred_idx ][ var_obj_idx ] = value;
+        _typed_registers[ pred_idx ][ var_obj_idx ] = value; 
     }
 
+    void setRegister( StateDescriptor *sd, const string &pred_type, const vector<int> &var_obj_idx, int value ){
+        auto var_id_list = sd->getPredicateVarTypeIDs( pred_type );
+        auto pred_idx = sd->getPredicateIDX( pred_type );
+        assert( pred_idx < (int)_typed_registers.size() );
+        _typed_registers[ pred_idx ][ var_obj_idx ] = value; 
+
+    }
+
+    void setRegister( StateDescriptor *sd, const int &pred_idx, const vector<int> &var_obj_idx, int value ){
+        assert( pred_idx < (int)_typed_registers.size() );
+        _typed_registers[ pred_idx ][ var_obj_idx ] = value; 
+
+    }
+
+    void setRegister( StateDescriptor *sd, vector< map< vector< int >, int > >& typed_registers ){
+        _typed_registers = typed_registers;
+    }    
     // In "value" is encoded the var-object binding
     /*void delRegister( StateDescriptor *sd, const string &pred_type, const vector<int> &value ){
         auto pred_idx = sd->getPredicateIDX( pred_type );
@@ -115,15 +132,12 @@ public:
             _typed_registers[ pred_idx ].erase( it );
     }*/
 
-    int getRegister( StateDescriptor *sd, const string &pred_type, const vector<int> &var_obj_idx ) const{
-        auto pred_idx = sd->getPredicateIDX( pred_type );
-        assert( pred_idx < (int)_typed_registers.size() );
-        auto it = _typed_registers[ pred_idx ].find( var_obj_idx );
-        if( it == _typed_registers[ pred_idx ].end() )
-            return 0;
-        return (it->second);
+//
+    vector< map< vector< int >, int > > getTypedRegisters(){
+        return _typed_registers;
     }
-	
+
+//
 	vector< vector< int > > getStateVars() const{
 		vector< vector< int > > state_vars = _typed_pointers;
 		for( const auto& pred_regs : _typed_registers ) {
@@ -138,6 +152,22 @@ public:
 		return state_vars;
 	}
 	
+    int getRegister( StateDescriptor *sd, const string &pred_type, const vector<int> &var_obj_idx ) const{
+        auto pred_idx = sd->getPredicateIDX( pred_type );
+        //assert( pred_idx >= (int)_typed_registers.size() );
+        auto it = _typed_registers[ pred_idx ].find( var_obj_idx );
+        if( it == _typed_registers[ pred_idx ].end() )
+            return 0;
+        return (it->second);
+    }
+
+    int getRegister( StateDescriptor *sd, const int &pred_idx, const vector<int> &var_obj_idx ) const{
+        auto it = _typed_registers[ pred_idx ].find( var_obj_idx );
+        if( it == _typed_registers[ pred_idx ].end() )
+            return 0;
+        return (it->second);
+    }    
+
 	int size() const{
 	    int res = 0;
 	    for( const auto& tp : _typed_pointers )
@@ -214,6 +244,7 @@ public:
 
 private:
     vector< vector< int > > _typed_pointers; // VarType -> {pointer1 = value1; ...; pointerN = valueN }
+    
 	vector< map< vector< int >, int > > _typed_registers; // PredType ( size = |Obj1| x ... x |ObjM|;  or size=1 for 0-ary)
 	int _instance_id;
 };

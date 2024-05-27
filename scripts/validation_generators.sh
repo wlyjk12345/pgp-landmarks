@@ -69,3 +69,11 @@ fi
 PYTHONHASHSEED=1 python domain/generators/visitall.py 12 61 domain/validation/visitall/
 
 
+echo 'Generating Coin validation instances...'
+if [ -d "domain/validation/coin/" ]; then
+	rm -rf domain/validation/coin/*
+else
+	mkdir -p "domain/validation/coin"
+fi 
+PYTHONHASHSEED=1 python domain/generators/visitall.py 12 61 domain/validation/coin/
+

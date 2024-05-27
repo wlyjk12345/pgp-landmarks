@@ -67,3 +67,11 @@ else
 	mkdir -p "domain/synthesis/visitall"
 fi 
 PYTHONHASHSEED=1 python domain/generators/visitall.py 2 11 domain/synthesis/visitall/
+
+echo 'Generating Coin synthesis instances...'
+if [ -d "domain/synthesis/coin/" ]; then
+	rm -rf domain/synthesis/coin/*
+else
+	mkdir -p "domain/synthesis/coin"
+fi 
+PYTHONHASHSEED=1 python domain/generators/coin.py 2 11 domain/synthesis/coin/

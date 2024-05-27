@@ -3,12 +3,16 @@
 
 #include "common.h"
 #include "state.h"
+#include <iostream> 
+#include <vector>
 
 class ProgramState{
 public:
 	ProgramState(){
 		_state = nullptr;
 		_line = 0;
+
+		_timestamp = 0; //
 	}
 	
 	~ProgramState(){
@@ -17,10 +21,17 @@ public:
 	
 	void setState( State *s ){
 		_state = s;
+
+		_stateHistory.push_back(s->copy()); // 将新状态推入历史记录
+    	_timestamp += 1; // 更新当前时间戳;
 	}
 	
 	void setLine( int l ){
 		_line = l;
+	}
+
+	void setTimestamp(int timestamp){
+    _timestamp = timestamp;
 	}
 	
 	State* getState() const{
@@ -29,6 +40,17 @@ public:
 	
 	int getLine() const{
 		return _line;
+	}
+
+	State* getStateAtTimestamp(int timestamp){
+    if (timestamp >= 0 && static_cast<size_t>(timestamp) < _stateHistory.size()) {
+        return _stateHistory[timestamp];
+    }
+    return nullptr; // 如果时间戳超出范围，返回nullptr
+	}
+
+	vector<State*>  getStateHistory(){
+        return _stateHistory;
 	}
 
 	vector< int > asVector() const{
@@ -53,10 +75,17 @@ public:
             ret += _state->toString(sd);
         return ret;
 	}
+
+
+	vector<State*> _stateHistory; 
+	int _timestamp; 
 	
 private:
 	State *_state;
 	int _line;
+	//
+	
+    
 };
 
 #endif

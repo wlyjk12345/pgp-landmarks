@@ -1,0 +1,38 @@
+COIN
+
+STATE DESCRIPTOR:
+agent:var_type
+object:var_type
+peeking(agent):pred_type
+face(object):pred_type
+a:agent
+b:agent
+c:object
+
+ACTION: single_peek(x:agent)
+TYPE: memory
+PRECONDITIONS:
+( peeking(x) = 0 )
+EFFECTS:
+( peeking(x) = 1 )
+
+ACTION: return(x:agent)
+TYPE: memory
+PRECONDITIONS:
+( peeking(x) = 1 )
+EFFECTS:
+( peeking(x) = 0 )
+
+ACTION: turn_coin_true(y:object)
+TYPE: memory
+PRECONDITIONS:
+( face(y) = 0 )
+EFFECTS:
+( face(y) = 1 )
+
+ACTION: turn_coin_false(y:object)
+TYPE: memory
+PRECONDITIONS:
+( face(y) = 1 )
+EFFECTS:
+( face(y) = 0 )

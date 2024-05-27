@@ -6,6 +6,8 @@
 #include "instruction.h"
 #include "generalized_planning_problem.h"
 #include "landmark_graph.h"
+#include "epistemic_model.h"
+
 
 class Program{
 public:
@@ -84,7 +86,7 @@ public:
 		return false;
 	}
 	
-	bool checkGoal( ProgramState *ps, Instance *ins, int &error ){
+	bool checkGoal( ProgramState *ps, Instance *ins, int &error , StateDescriptor* sd){
 		int line = ps->getLine();
 		if( _instructions[ line ] == nullptr ) return false;
 		End *end = dynamic_cast<End*>( _instructions[ line ] );
@@ -95,7 +97,42 @@ public:
 			error = -1; // ERROR 1: Incorrect program
 			return false;
 		}
+
+		std::map<std::string, PDDL_TERNARY> e_goal = ins->getEGoal();
+		// Check if egoal map is empty
+		if (!e_goal.empty()) {
+cout<<"program_goal"<<endl;
+for (const auto& entry : e_goal) {
+			std::cout << "Key:" << entry.first << ", Value:" << PDDL_TERNARY_to_string(entry.second) << std::endl;
+}	
+
+
+
+		
+			EpistemicModel emodel;
+			std::map<std::string, PDDL_TERNARY> e_outcome = emodel.epistemicGoalsHandler(ins->getEGoal(), "", ps->_stateHistory, ps->_stateHistory, sd, ins);
+
+
+			if( end and not compare_e_goal(e_goal, e_outcome)) {
+				error = -1; // ERROR 1: Incorrect program
+				return false;
+			}
+		}
+
 		return false;
+	}
+
+	bool compare_e_goal(const std::map<std::string, PDDL_TERNARY>& goal, const std::map<std::string, PDDL_TERNARY>& outcome) {
+		// Iterate through the goal and check if each key-value pair in the outcome matches the goal
+		for (const auto& [key, value] : goal) {
+			auto it = outcome.find(key);
+			if (it == outcome.end() || it->second != value) {
+				// If any key is not found in the outcome or has a different value, return false
+				return false;
+			}
+		}
+		// All key-value pairs in the goal match the outcome, return true
+		return true;
 	}
 
 	static bool checkDeadEnd(StateDescriptor *sd, ProgramState *ps, LandmarkGraph *lm, int &error ){
@@ -143,6 +180,8 @@ public:
 			Instance *ins = gpp->getInstance( id );			
 			ProgramState *ps = pss[ id ];
 			State *s = ( ins->getInitialState() )->copy();
+
+
 			int line = ps->getLine();
 			ps->setState( s );
 
@@ -315,7 +354,7 @@ public:
 			}
 
             if( error == 0 )
-			    checkGoal( ps, ins, error );
+			    checkGoal( ps, ins, error, sd);
 			if( DEADEND_DETECTION and use_landmarks and error == 0) {
                 checkDeadEnd(sd, ps, _landmark_graph[id], error );
 			}

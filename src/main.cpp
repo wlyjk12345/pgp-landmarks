@@ -53,6 +53,7 @@ int main(  int argc, const char* argv[] ){
         preprocess_landmarks = true;
         heuristics = "_landmarks";
     }
+	cout << problem_folder + "domain.txt" << endl;
 	
 	ifstream ifs_domain( problem_folder + "domain.txt" );
 	if( !ifs_domain ){
@@ -124,28 +125,10 @@ int main(  int argc, const char* argv[] ){
 	time( &gd_time );
 	cout << "[INFO] Generalized Domain created. [" << difftime( gd_time, gpp_time ) << "]" << endl;
 
-	vector<LandmarkGraph*> landmark_graphs;
-    if( preprocess_landmarks ) {
-        for (int id = 0; id < gpp->getNumInstances(); id++) {
-            landmark_graphs.push_back(new LandmarkGraph(dom, gpp->getInstance(id)));
-            ofstream ofs_prog(outfile + "-" + to_string(id) + ".lg" );
-            ofs_prog << landmark_graphs[id]->toString() << endl;
-            ofs_prog.close();
-        }
-    }
-
-    time_t landmarks_time;
-    time( &landmarks_time );
-    cout << "[INFO] Landmarks created. [" << difftime( landmarks_time, gd_time ) << "]" << endl;
-
 	auto *engine = new BFS( program_lines, gd, gpp );
-    if( preprocess_landmarks ) {
-        engine->setLandmarks(landmark_graphs);
-    }
 
 	time_t engine_time;
 	time( &engine_time );
-	cout << "[INFO] Engine created. [" << difftime( engine_time, landmarks_time ) << "]" << endl;
 
     for( const auto& h_name : heuristic_names ){
         if( h_name == "h1" ) engine->addHeuristic( new H1() );

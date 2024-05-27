@@ -1,0 +1,16 @@
+COIN-8
+
+OBJECTS:
+a:agent
+b:agent
+c:object
+
+INIT:
+( peeking(a) = 0 )
+( peeking(b) = 0 )
+( face(c) = 0 )
+
+GOAL:
+( peeking(a) = 0 )
+( peeking(b) = 1 )
+( face(c) = 0 )

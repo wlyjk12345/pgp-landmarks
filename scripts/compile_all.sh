@@ -11,6 +11,7 @@ echo 'Generating folders...'
 [ ! -d "domain/synthesis/ontable/" ] && mkdir -p "domain/synthesis/ontable"
 [ ! -d "domain/synthesis/spanner/" ] && mkdir -p "domain/synthesis/spanner"
 [ ! -d "domain/synthesis/visitall/" ] && mkdir -p "domain/synthesis/visitall"
+[ ! -d "domain/synthesis/coin/" ] && mkdir -p "domain/synthesis/coin"
 
 [ ! -d "domain/validation/" ] && mkdir -p "domain/validation"
 
@@ -22,6 +23,7 @@ echo 'Generating folders...'
 [ ! -d "domain/validation/ontable/" ] && mkdir -p "domain/validation/ontable"
 [ ! -d "domain/validation/spanner/" ] && mkdir -p "domain/validation/spanner"
 [ ! -d "domain/validation/visitall/" ] && mkdir -p "domain/validation/visitall"
+[ ! -d "domain/validation/coin/" ] && mkdir -p "domain/validation/coin"
 
 [ ! -d "experiments/" ] && mkdir -p "experiments"
 [ ! -d "experiments/synthesis/" ] && mkdir -p "experiments/synthesis"

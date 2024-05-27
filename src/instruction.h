@@ -63,6 +63,7 @@ public:
 		int res = 0;
 		if( isApplicable( ps ) ){
 		    res = _act->apply( s );
+ps->setState(s);
 		}
 		
 		ps->setLine( line + 1 );
@@ -144,6 +145,9 @@ public:
 	
 	bool isGoalState( Instance *ins, ProgramState *ps ) override{
 		State *s = ps->getState();
+
+		vector<State*> _stateHistory = ps->getStateHistory();  
+
 		vector< Condition* > goal = ins->getGoalCondition();
 		
 		for(auto & g : goal){
